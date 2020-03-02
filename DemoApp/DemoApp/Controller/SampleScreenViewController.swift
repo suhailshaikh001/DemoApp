@@ -19,6 +19,13 @@ class SampleScreenViewController: UIViewController {
     
     let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout.init()
     
+    let activityIndicator : UIActivityIndicatorView = {
+        let mainIndicator = UIActivityIndicatorView()
+        mainIndicator.translatesAutoresizingMaskIntoConstraints = false
+        mainIndicator.style = .gray
+        return mainIndicator
+    }()
+    
     //Variables
     var authorList : Author?
     
@@ -48,18 +55,27 @@ class SampleScreenViewController: UIViewController {
     fileprivate func setupConstraints(){
         
         self.view.addSubview(authorCollectionView)
+        self.view.addSubview(activityIndicator)
         
         //author collection view
         self.authorCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 15).isActive = true
         self.authorCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 15).isActive = true
         self.authorCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -15).isActive = true
         self.authorCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -5).isActive = true
+        
+        //For indicator
+        self.activityIndicator.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        self.activityIndicator.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
     }
     
     //MARK:- Web service
     fileprivate func getAuthorListWS(){
         
         if CheckInternet.Connection(){
+            
+            DispatchQueue.main.async {
+                self.activityIndicator.startAnimating()
+            }
             
             let url = baseURL + getAuthorListURL
             let strUrl = URL(string: url)
@@ -81,6 +97,7 @@ class SampleScreenViewController: UIViewController {
                         
                         DispatchQueue.main.async {
                             self.authorCollectionView.reloadData()
+                            self.activityIndicator.stopAnimating()
                         }
                         
                     }
@@ -93,6 +110,7 @@ class SampleScreenViewController: UIViewController {
                 }
                 
             }).resume()
+            
             
         }
         else{
